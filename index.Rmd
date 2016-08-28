@@ -1,0 +1,211 @@
+---
+title       : Motor Trend Data set
+subtitle    : Dedicated app for linear modeling
+author      : Dylan Tweed
+job         : 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+#knit        : slidify::knit2slides
+output: 
+  ioslides_presentation: 
+    keep_md: yes
+---
+
+## Choosing the variable (Sidebar)
+
+Variables selected into `pdata` are chosen through a menu for each entry except model.
+
+* Among the continuous variables for 
+    * `x` (abscissa), `y` (ordinate), `size` (bubble size)
+* Among the factor variables for 
+    * `col` (bubble color)
+    
+```{r}
+data(mtcars)
+# Copy selected data into a new dataframe
+pdata <- data.frame(
+            model=as.character(row.names(mtcars)),
+            x = mtcars$wt, y = mtcars$mpg,
+            col = as.factor(mtcars$cyl),size = mtcars$disp
+        )
+```
+
+## Choosing the Linear model (Sidebar)
+
+Model options `usesize` and `usecross` are selected by the user
+
+```{r}
+usesize <- F
+usecross <- F
+# Custom Linear model
+if(usesize){ # include extra variable
+    if(usecross) { # multiple slopes
+        modfit <- lm(y~x*col+x*size,data=pdata)
+    } else { # single slope
+        modfit <- lm(y~x+col+size,data=pdata)
+    }
+} else { # does not include extra variable
+    if(usecross) { # multiple slopes
+        modfit <- lm(y~x*col,data=pdata)
+    } else { # single slope
+        modfit <- lm(y~x+col,data=pdata)
+    }}
+```
+
+## Visualization (Visualization Tab)
+
+```{r,echo=F,warning=F,message=F,fig.width=7,fig.height=3}
+
+library(ggvis,dplyr)
+
+xrang <- c(1,6)
+yrang <- c(10,35)
+xlab  <- "Weight [1000 lbs]"
+ylab  <- "Miles/(US) gallon"
+slab  <- "Displacement [cu.in]"
+clab  <- "Nb of cylinders"
+sval  <- 50
+# quick and durty linear model for getting a size input
+sizemod <- lm(size~x+col,data=pdata)
+
+locvis <- pdata %>%
+    ggvis(~x,~y) %>%
+    layer_points(size=~size,fill=~col,key := ~model,
+                 size.hover := 500,fillOpacity := 0.4, fillOpacity.hover := 0.6
+    ) %>%
+    # use axis titles
+    add_axis("x",title=xlab) %>%
+    add_axis("y",title=ylab) %>%
+    # set legends
+    add_legend(c("fill","stroke"),title=clab,orient='left') %>%
+    add_legend("size",title=slab) %>%
+    # set scales
+    scale_numeric("x",domain = xrang) %>%
+    scale_numeric("y",domain = yrang) %>%
+    scale_numeric("size",range = c(30,300)) 
+
+for(cv in levels(pdata$col)){
+    # create date frame for plotting the fit line 
+    # starting form range of x with a given color
+    xrange <- range(pdata$x[pdata$col==cv])
+    dfp <- data.frame(
+        x=xrange,
+        col =rep(cv,2)
+    )
+    # use linear model to predict the size variable
+    spr <- predict(sizemod,newdata=dfp,interval="confidence",level=0.90)
+    # choose value within confidence interval
+    dfp$size <- spr[,"fit"] + (sval-5)/95.*(spr[,"upr"] - spr[,"lwr"])
+    # use linear model to predict y
+    dfp$y <- predict(modfit,newdata=dfp)
+    # add layer with new line
+    locvis <- locvis %>%
+        layer_paths(data=dfp,x=~x,y=~y,stroke=~col,strokeWidth:=4)
+    # create function for extending fitting to the full range of the plot
+    gety_ext <- function(x){
+        # compute y(x) folloming the line passing hrough dfp
+        dfp$y[1] + (dfp$y[2]-dfp$y[1])/(dfp$x[2]-dfp$x[1])*(x-dfp$x[1])
+    }
+    getx_ext <- function(y){
+        # compute x(y) folloming the line passing hrough dfp
+        dfp$x[1] + (dfp$x[2]-dfp$x[1])/(dfp$y[2]-dfp$y[1])*(y-dfp$y[1])
+    }
+    correct_ext <- function(dfloc){
+        # change point outside the axis range
+        ymin <- yrang[1]
+        ymax <- yrang[2]
+        # recompute x as a function of the range in y
+        dfloc$x[dfloc$y<ymin] <- getx_ext(ymin)
+        dfloc$x[dfloc$y>ymax] <- getx_ext(ymax)
+        # change y accordingly to the correct range.
+        dfloc$y[dfloc$y<ymin] <- ymin
+        dfloc$y[dfloc$y>ymax] <- ymax
+        dfloc
+    }
+    # create the fit line ranging the range of the plot
+    dfext <- data.frame(
+        x = xrang,
+        col =rep(cv,2)
+    )
+    dfext$y <- sapply(dfext$x,gety_ext)
+    dfext   <- correct_ext(dfext)
+    # add layer with new line
+    locvis <- locvis %>%
+        layer_paths(data=dfext,x=~x,y=~y,stroke=~col,strokeWidth:=2,strokeDash:=6)
+}
+locvis
+
+```
+
+```{r,echo=F,fig.width=7,fig.height=2}
+resdata <- data.frame(
+    model = pdata$model,
+    val = pdata$y,
+    pr = predict(modfit),
+    res = modfit$residuals,
+    size = pdata$size,
+    col  = pdata$col
+)
+
+resdata %>% ggvis(~pr,~res) %>%
+    layer_points(size=~size,fill=~col,key := ~model,
+                 size.hover := 500,fillOpacity := 0.4, fillOpacity.hover := 0.6
+    ) %>%
+    # use axis titles
+    add_axis("x",title=paste("Prediction ",ylab)) %>%
+    add_axis("y",title="Residuals") %>%
+    # set legends
+    add_legend(c("fill","stroke"),title=clab,orient='left') %>%
+    add_legend("size",title=slab) %>%
+    # set scales
+    scale_numeric("x",domain = yrang) %>%
+    scale_numeric("size",range = c(30,300))
+
+```
+
+
+## Model properties (Modelization Tab)
+
+Current model coefficients
+
+```{r,echo=F}
+modcoefs <- summary(modfit)$coef
+# modifiy row names
+patarr  <- c("^x","col","size")
+reparr  <- c("Weight",paste("Nb of Cylinders","= "),"Displacement")
+for(i in 1:length(patarr)){
+    row.names(modcoefs) <- gsub(patarr[i],reparr[i],row.names(modcoefs))
+}
+modcoefs
+```
+
+Comparison to other models
+
+```{r,echo=F}
+# single slope
+strmod0 <- paste("mpg~wt+col") 
+modfit0 <- lm(y~x+col,data=pdata)
+# single slope extra variable
+strmod1 <- paste("mpg~wt+col+disp")
+modfit1 <- lm(y~x+col+size,data=pdata)
+# multiple slope
+strmod2 <- paste("mpg~wt*col")
+modfit2 <- lm(y~x*col,data=pdata)
+# multiple slope extra variable
+strmod3 <- paste("mpg~wt*col+wt*size") 
+modfit3 <- lm(y~x*col+x*size,data=pdata)
+anmod <- anova(modfit0,modfit1,modfit2,modfit3)
+r2sq <- data.frame("R squared"=c(
+    summary(modfit0)$r.squared,
+    summary(modfit1)$r.squared,
+    summary(modfit2)$r.squared,
+    summary(modfit3)$r.squared
+    
+))
+row.names(anmod) <- c(strmod0,strmod1,strmod2,strmod3)
+anmod<- (cbind(anmod,r2sq))
+subset(anmod,select=c("Res.Df","RSS","F","Pr(>F)","R.squared"))
+```
