@@ -46,27 +46,27 @@ if(usesize){ # include extra variable
 
 ## Visualization (Visualization Tab)
 
-<!--html_preserve--><div id="plot_id126987894-container" class="ggvis-output-container">
-<div id="plot_id126987894" class="ggvis-output"></div>
+<!--html_preserve--><div id="plot_id716904780-container" class="ggvis-output-container">
+<div id="plot_id716904780" class="ggvis-output"></div>
 <div class="plot-gear-icon">
 <nav class="ggvis-control">
 <a class="ggvis-dropdown-toggle" title="Controls" onclick="return false;"></a>
 <ul class="ggvis-dropdown">
 <li>
 Renderer: 
-<a id="plot_id126987894_renderer_svg" class="ggvis-renderer-button" onclick="return false;" data-plot-id="plot_id126987894" data-renderer="svg">SVG</a>
+<a id="plot_id716904780_renderer_svg" class="ggvis-renderer-button" onclick="return false;" data-plot-id="plot_id716904780" data-renderer="svg">SVG</a>
  | 
-<a id="plot_id126987894_renderer_canvas" class="ggvis-renderer-button" onclick="return false;" data-plot-id="plot_id126987894" data-renderer="canvas">Canvas</a>
+<a id="plot_id716904780_renderer_canvas" class="ggvis-renderer-button" onclick="return false;" data-plot-id="plot_id716904780" data-renderer="canvas">Canvas</a>
 </li>
 <li>
-<a id="plot_id126987894_download" class="ggvis-download" data-plot-id="plot_id126987894">Download</a>
+<a id="plot_id716904780_download" class="ggvis-download" data-plot-id="plot_id716904780">Download</a>
 </li>
 </ul>
 </nav>
 </div>
 </div>
 <script type="text/javascript">
-var plot_id126987894_spec = {
+var plot_id716904780_spec = {
   "data": [
     {
       "name": ".0",
@@ -528,30 +528,30 @@ var plot_id126987894_spec = {
   },
   "handlers": null
 };
-ggvis.getPlot("plot_id126987894").parseSpec(plot_id126987894_spec);
+ggvis.getPlot("plot_id716904780").parseSpec(plot_id716904780_spec);
 </script><!--/html_preserve-->
 
-<!--html_preserve--><div id="plot_id444535022-container" class="ggvis-output-container">
-<div id="plot_id444535022" class="ggvis-output"></div>
+<!--html_preserve--><div id="plot_id748943419-container" class="ggvis-output-container">
+<div id="plot_id748943419" class="ggvis-output"></div>
 <div class="plot-gear-icon">
 <nav class="ggvis-control">
 <a class="ggvis-dropdown-toggle" title="Controls" onclick="return false;"></a>
 <ul class="ggvis-dropdown">
 <li>
 Renderer: 
-<a id="plot_id444535022_renderer_svg" class="ggvis-renderer-button" onclick="return false;" data-plot-id="plot_id444535022" data-renderer="svg">SVG</a>
+<a id="plot_id748943419_renderer_svg" class="ggvis-renderer-button" onclick="return false;" data-plot-id="plot_id748943419" data-renderer="svg">SVG</a>
  | 
-<a id="plot_id444535022_renderer_canvas" class="ggvis-renderer-button" onclick="return false;" data-plot-id="plot_id444535022" data-renderer="canvas">Canvas</a>
+<a id="plot_id748943419_renderer_canvas" class="ggvis-renderer-button" onclick="return false;" data-plot-id="plot_id748943419" data-renderer="canvas">Canvas</a>
 </li>
 <li>
-<a id="plot_id444535022_download" class="ggvis-download" data-plot-id="plot_id444535022">Download</a>
+<a id="plot_id748943419_download" class="ggvis-download" data-plot-id="plot_id748943419">Download</a>
 </li>
 </ul>
 </nav>
 </div>
 </div>
 <script type="text/javascript">
-var plot_id444535022_spec = {
+var plot_id748943419_spec = {
   "data": [
     {
       "name": ".0",
@@ -739,7 +739,7 @@ var plot_id444535022_spec = {
   },
   "handlers": null
 };
-ggvis.getPlot("plot_id444535022").parseSpec(plot_id444535022_spec);
+ggvis.getPlot("plot_id748943419").parseSpec(plot_id748943419_spec);
 </script><!--/html_preserve-->
 
 
